@@ -55,6 +55,7 @@ procinit(void)
       initlock(&p->lock, "proc");
       p->state = UNUSED;
       p->kstack = KSTACK((int) (p - proc));
+      p->mask = 0;
   }
 }
 
@@ -100,6 +101,18 @@ allocpid()
   release(&pid_lock);
 
   return pid;
+}
+
+// get nproc
+int 
+getnproc()
+{
+  struct proc *p;
+  int nproc = 0;
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if(p->state != UNUSED) nproc++;
+  }
+  return nproc;
 }
 
 // Look in the process table for an UNUSED proc.
@@ -295,6 +308,9 @@ fork(void)
     return -1;
   }
   np->sz = p->sz;
+
+  //copy trace mask
+  np->mask = p->mask;
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);

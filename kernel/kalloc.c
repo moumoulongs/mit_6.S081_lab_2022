@@ -80,3 +80,23 @@ kalloc(void)
     memset((char*)r, 5, PGSIZE); // fill with junk
   return (void*)r;
 }
+
+//获取空闲内存大小
+int 
+getfreemem()
+{
+
+  int tot = 0; // 空闲页面数量
+  struct run *r; // 用于遍历freelist
+
+  acquire(&kmem.lock); // 获取自旋锁
+  r = kmem.freelist;
+  while(r)
+  {
+    tot++;
+    r = r->next;
+  }
+  release(&kmem.lock); // 释放自旋锁
+
+  return tot*PGSIZE;
+}

@@ -1,0 +1,2 @@
+sysinfotest: start
+sysinfotest: OK
